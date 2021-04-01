@@ -20,22 +20,22 @@ const bodyP = require('body-parser')
 app.use(bodyP.json());
 
 // Create Model for Employye collection
-var employee = new mongoose.Schema({
+let employee = new mongoose.Schema({
     name: String,
     company: String
 })
 
 // post request
 app.post("/login", (req, res) => {
-    var data = req.body;
-    var userKey = ['name', 'company' , 'delete' , 'update' , 'updateField'];
-    var keys = Object.keys(data);
-    var missingKey = new Array();
-    var employeeName = data.name;
-    var companyName = data.company;
-    var deleteName = data.delete;
-    var updateName = data.update;
-    var updateField = data.updateField;
+    let data = req.body;
+    let userKey = ['name', 'company' , 'delete' , 'update' , 'updateField'];
+    let keys = Object.keys(data);
+    let missingKey = new Array();
+    let employeeName = data.name;
+    let companyName = data.company;
+    let deleteName = data.delete;
+    let updateName = data.update;
+    let updateField = data.updateField;
 
     // All field is filled so match userid and password
     if (userKey.length == keys.length) {
@@ -49,9 +49,9 @@ app.post("/login", (req, res) => {
         // checking missing field
 
     } else {
-        for (var i = 0; i < userKey.length; i++) {
-            var counter = 0;
-            for (var j = 0; j < keys.length; j++) {
+        for (let i = 0; i < userKey.length; i++) {
+            let counter = 0;
+            for (let j = 0; j < keys.length; j++) {
                 if (userKey[i] == keys[j]) {
                     counter++;
                 }
@@ -60,7 +60,7 @@ app.post("/login", (req, res) => {
                 missingKey.push(userKey[i]);
             }
         }
-        var responseJSON = {
+        let responseJSON = {
             "messages": "Required Fields Missing",
             "data": missingKey,
             "status": "‘Required Param Missing"
@@ -78,19 +78,19 @@ app.post("/login", (req, res) => {
 
    
 
-    var Data = new mongoose.model("Data", employee);
+    let Data = new mongoose.model("Data", employee);
 
     // Insert data in Database
 
     const insertData = async () => {
         try {
-            var newdata1 = new Data({
+            let newdata1 = new Data({
                 name: employeeName,
                 company: companyName
             })
 
 
-            var result = await Data.insertMany([newdata1]);
+            let result = await Data.insertMany([newdata1]);
 
             console.log(result)
 
@@ -104,7 +104,7 @@ app.post("/login", (req, res) => {
 
 
     // get Data from DB
-    var getData = async () => {
+    let getData = async () => {
         try {
             const result = await Data.find();
             console.log(result);
@@ -119,7 +119,7 @@ app.post("/login", (req, res) => {
 
 
     // Updateding Data
-    var updateData = async () => {
+    let updateData = async () => {
         try {
             const updateResult = await Data.updateOne({
                 name: updateName
@@ -138,7 +138,7 @@ app.post("/login", (req, res) => {
 
     // deleting Data
 
-    var deleteData = async () => {
+    let deleteData = async () => {
         try {
             const DeleteResult = await Data.deleteOne({
                 name: deleteName
@@ -152,7 +152,7 @@ app.post("/login", (req, res) => {
 
     // final Data 
 
-    var finalData = async () => {
+    let finalData = async () => {
         try {
             console.log("Final Data is :")
             const result = await Data.find();
