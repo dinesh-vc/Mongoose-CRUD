@@ -16,7 +16,10 @@ const host = process.env.HOST;
 
 // parsing data 
 
-const bodyP = require('body-parser')
+const bodyP = require('body-parser');
+const {
+    Router
+} = require('express');
 app.use(bodyP.json());
 
 // Create Model for Employye collection
@@ -25,60 +28,30 @@ let employee = new mongoose.Schema({
     company: String
 })
 
+// Database connection 
+mongoose.connect("mongodb://localhost:27017/employee", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => console.log("Connection Succesfull")).catch((err) => console.log(err));
+
+
+
+let Data = new mongoose.model("Data", employee);
+
 // post request
-app.post("/login", (req, res) => {
+
+
+app.post("/insert", (req, res) => {
     let data = req.body;
-    let userKey = ['name', 'company' , 'delete' , 'update' , 'updateField'];
-    let keys = Object.keys(data);
-    let missingKey = new Array();
     let employeeName = data.name;
     let companyName = data.company;
-    let deleteName = data.delete;
+
     let updateName = data.update;
     let updateField = data.updateField;
 
     // All field is filled so match userid and password
-    if (userKey.length == keys.length) {
-
-        console.log(employeeName);
-        console.log(companyName);
-
-        res.send(`Data Inserted ${employeeName} and Delete ${deleteName} and updated ${updateName} `);
-        res.status(200)
-
-        // checking missing field
-
-    } else {
-        for (let i = 0; i < userKey.length; i++) {
-            let counter = 0;
-            for (let j = 0; j < keys.length; j++) {
-                if (userKey[i] == keys[j]) {
-                    counter++;
-                }
-            }
-            if (counter == 0) {
-                missingKey.push(userKey[i]);
-            }
-        }
-        let responseJSON = {
-            "messages": "Required Fields Missing",
-            "data": missingKey,
-            "status": "‘Required Param Missing"
-        }
-        console.log(responseJSON);
-        res.status(420)
-        res.json(responseJSON);
-    }
-
-    // Database connection 
-    mongoose.connect("mongodb://localhost:27017/employee", {
-        useNewUrlParser: true,
-        useUnifiedTopology: true
-    }).then(() => console.log("Connection Succesfull")).catch((err) => console.log(err));
-
-   
-
-    let Data = new mongoose.model("Data", employee);
+    console.log(employeeName);
+    console.log(companyName);
 
     // Insert data in Database
 
@@ -88,37 +61,26 @@ app.post("/login", (req, res) => {
                 name: employeeName,
                 company: companyName
             })
-
-
-            let result = await Data.insertMany([newdata1]);
-
+            let result = await Data.insertMany(newdata1);
             console.log(result)
 
         } catch (err) {
             console.log(err)
         }
-
-
     }
+    insertData();
+    res.send(`Data Inserted ${employeeName} `);
+    res.status(200);
 
+})
 
+// Updateding API Request
 
-    // get Data from DB
-    let getData = async () => {
-        try {
-            const result = await Data.find();
-            console.log(result);
+app.post("/update", (req, res) => {
+    let data = req.body;
+    let updateName = data.update;
+    let updateField = data.updateField;
 
-        } catch (err) {
-            console.log(err)
-        }
-
-
-
-    }
-
-
-    // Updateding Data
     let updateData = async () => {
         try {
             const updateResult = await Data.updateOne({
@@ -135,23 +97,14 @@ app.post("/login", (req, res) => {
         }
     }
 
-
-    // deleting Data
-
-    let deleteData = async () => {
-        try {
-            const DeleteResult = await Data.deleteOne({
-                name: deleteName
-            })
-            console.log(DeleteResult)
-        } catch (err) {
-            console.log(err)
-        }
-    }
+    updateData();
+    res.send(`Data Updated of ${updateName} `);
+    res.status(200);
+})
 
 
-    // final Data 
-
+// Creating API  Request
+app.post("/read", (req, res) => {
     let finalData = async () => {
         try {
             console.log("Final Data is :")
@@ -161,15 +114,34 @@ app.post("/login", (req, res) => {
         } catch (err) {
             console.log(err)
         }
-
     }
 
-    insertData();
-    getData();
-    updateData();
-    deleteData();
     finalData();
+    res.send(`Data read Succesfully`);
+    res.status(200);
 
+})
+
+
+
+// deleting API Request
+app.post("/delete", (req, res) => {
+    let data = req.body;
+    let deleteName = data.delete;
+
+    let deleteData = async () => {
+        try {
+            const DeleteResult = await Data.deleteMany({
+                name: deleteName
+            })
+            console.log(DeleteResult)
+        } catch (err) {
+            console.log(err)
+        }
+    }
+    deleteData();
+    res.send(`Data Deleted of ${deleteName} `);
+    res.status(200);
 })
 
 // ḷistening server
