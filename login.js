@@ -60,8 +60,8 @@ app.post("/insert", (req, res) => {
             let newdata1 = new Data({
                 name: employeeName,
                 company: companyName
-            })
-            let result = await Data.insertMany(newdata1);
+            });
+            let result =await newdata1.save();
             console.log(result)
 
         } catch (err) {
